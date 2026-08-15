@@ -4,6 +4,7 @@ import com.PaySphere.dto.salary.SalaryCreateRequest;
 import com.PaySphere.dto.salary.SalaryResponse;
 import com.PaySphere.entity.Employee;
 import com.PaySphere.entity.HrUser;
+import com.PaySphere.entity.PaymentStatus;
 import com.PaySphere.entity.SalaryHistory;
 import com.PaySphere.exception.BadRequestException;
 import com.PaySphere.exception.ResourceNotFoundException;
@@ -12,12 +13,15 @@ import com.PaySphere.repository.EmployeeRepository;
 import com.PaySphere.repository.HrUserRepository;
 import com.PaySphere.repository.SalaryHistoryRepository;
 import com.PaySphere.security.AppUserPrincipal;
+import com.PaySphere.service.EmailService;
+import com.PaySphere.service.ExcelReportService;
 import com.PaySphere.service.SalaryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,6 +33,8 @@ public class SalaryServiceImpl implements SalaryService {
     private final EmployeeRepository employeeRepository;
     private final HrUserRepository hrUserRepository;
     private final SalaryMapper salaryMapper;
+    private final ExcelReportService excelReportService;
+    private final EmailService emailService;
 
     @Override
     @Transactional(readOnly = true)
@@ -84,6 +90,31 @@ public class SalaryServiceImpl implements SalaryService {
 
         SalaryHistory saved = salaryHistoryRepository.save(newSalary);
         return salaryMapper.toResponse(saved);
+    }
+
+    @Override
+    @Transactional
+    public SalaryResponse markAsPaid(Long employeeId, Long salaryId) {
+        SalaryHistory salary = salaryHistoryRepository.findById(salaryId)
+                .orElseThrow(() -> new ResourceNotFoundException("Salary record not found with id: " + salaryId));
+
+        if (!salary.getEmployee().getId().equals(employeeId)) {
+            throw new ResourceNotFoundException("Salary record not found with id: " + salaryId);
+        }
+
+        if (salary.getPaymentStatus() == PaymentStatus.PAID) {
+            throw new BadRequestException("This salary record has already been marked as paid");
+        }
+
+        salary.setPaymentStatus(PaymentStatus.PAID);
+        salary.setPaidAt(LocalDateTime.now());
+
+        Employee employee = salary.getEmployee();
+        byte[] payslip = excelReportService.generatePayslip(salary);
+        String fileName = "payslip-%s-%s.xlsx".formatted(employee.getEmployeeCode(), salary.getEffectiveFrom());
+        emailService.sendPayslip(employee.getEmail(), employee.getFirstName() + " " + employee.getLastName(), payslip, fileName);
+
+        return salaryMapper.toResponse(salary);
     }
 
     private void ensureEmployeeExists(Long employeeId) {

@@ -47,6 +47,21 @@ export interface EmployeeSummaryResponse {
   status: EmployeeStatus;
 }
 
+export interface BulkUploadRowResult {
+  rowNumber: number;
+  email: string;
+  success: boolean;
+  employeeCode: string | null;
+  message: string;
+}
+
+export interface BulkUploadResponse {
+  totalRows: number;
+  successCount: number;
+  failureCount: number;
+  results: BulkUploadRowResult[];
+}
+
 export interface EmployeeSearchParams {
   search?: string;
   countryId?: number;

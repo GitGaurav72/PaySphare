@@ -1,3 +1,5 @@
+import { PaymentStatus } from './enums';
+
 export interface SalaryCreateRequest {
   currencyCode: string;
   baseSalary: number;
@@ -16,4 +18,6 @@ export interface SalaryResponse {
   createdById: number;
   createdByName: string;
   createdAt: string;
+  paymentStatus: PaymentStatus;
+  paidAt: string | null;
 }

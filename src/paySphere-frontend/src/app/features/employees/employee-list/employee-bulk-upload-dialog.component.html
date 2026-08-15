@@ -1,0 +1,71 @@
+<h2 mat-dialog-title>Add bulk employees</h2>
+<mat-dialog-content>
+  <p class="hint">
+    Download the template, fill in employee details (Country, Department, and Designation
+    are dropdowns with the valid values), then upload the completed file.
+  </p>
+
+  <div class="bulk-actions">
+    <button mat-stroked-button type="button" [disabled]="downloadingTemplate()" (click)="downloadTemplate()">
+      @if (downloadingTemplate()) {
+        <mat-spinner diameter="18"></mat-spinner>
+      } @else {
+        <mat-icon>file_download</mat-icon>
+      }
+      Download template
+    </button>
+
+    <input type="file" accept=".xlsx" (change)="onFileSelected($event)" hidden #fileInput />
+    <button mat-stroked-button type="button" (click)="fileInput.click()">
+      <mat-icon>attach_file</mat-icon>
+      {{ selectedFile()?.name ?? 'Choose file' }}
+    </button>
+  </div>
+
+  @if (errorMessage()) {
+    <div class="error-banner">{{ errorMessage() }}</div>
+  }
+
+  @if (result(); as res) {
+    <div class="result-summary">
+      <mat-chip class="summary-chip success" disableRipple>{{ res.successCount }} created</mat-chip>
+      @if (res.failureCount > 0) {
+        <mat-chip class="summary-chip failure" disableRipple>{{ res.failureCount }} failed</mat-chip>
+      }
+    </div>
+
+    @if (res.failureCount > 0) {
+      <div class="failures-table-wrap">
+        <table mat-table [dataSource]="failedRows(res)" class="full-width">
+          <ng-container matColumnDef="row">
+            <th mat-header-cell *matHeaderCellDef>Row</th>
+            <td mat-cell *matCellDef="let r">{{ r.rowNumber }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="email">
+            <th mat-header-cell *matHeaderCellDef>Email</th>
+            <td mat-cell *matCellDef="let r">{{ r.email }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="message">
+            <th mat-header-cell *matHeaderCellDef>Reason</th>
+            <td mat-cell *matCellDef="let r">{{ r.message }}</td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="resultColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: resultColumns"></tr>
+        </table>
+      </div>
+    }
+  }
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-button type="button" (click)="close()">{{ result() ? 'Done' : 'Cancel' }}</button>
+  <button mat-flat-button color="primary" type="button" [disabled]="!selectedFile() || uploading()" (click)="upload()">
+    @if (uploading()) {
+      <mat-spinner diameter="20"></mat-spinner>
+    } @else {
+      <span>Upload</span>
+    }
+  </button>
+</mat-dialog-actions>

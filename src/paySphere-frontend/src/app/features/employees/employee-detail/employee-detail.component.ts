@@ -7,6 +7,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatTableModule } from '@angular/material/table';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -18,6 +19,7 @@ import { EmployeeResponse } from '../../../core/models/employee.model';
 import { SalaryResponse } from '../../../core/models/salary.model';
 import { EmployeeStatus } from '../../../core/models/enums';
 import { MoneyPipe } from '../../../shared/pipes/money.pipe';
+import { downloadBlob } from '../../../shared/utils/download.util';
 import { StatusUpdateDialogComponent } from './status-update-dialog.component';
 import { SalaryFormDialogComponent } from './salary-form-dialog.component';
 
@@ -33,6 +35,7 @@ import { SalaryFormDialogComponent } from './salary-form-dialog.component';
     MatChipsModule,
     MatTableModule,
     MatProgressSpinnerModule,
+    MatTooltipModule,
     MoneyPipe
   ],
   templateUrl: './employee-detail.component.html',
@@ -44,7 +47,7 @@ export class EmployeeDetailComponent implements OnInit {
   readonly currentSalary = signal<SalaryResponse | null>(null);
   readonly salaryHistory = signal<SalaryResponse[]>([]);
 
-  readonly historyColumns = ['effectiveFrom', 'effectiveTo', 'baseSalary', 'bonus', 'total', 'createdByName'];
+  readonly historyColumns = ['effectiveFrom', 'effectiveTo', 'baseSalary', 'bonus', 'total', 'paymentStatus', 'createdByName', 'actions'];
 
   private employeeId!: number;
 
@@ -113,6 +116,31 @@ export class EmployeeDetailComponent implements OnInit {
 
   total(salary: SalaryResponse): number {
     return salary.baseSalary + (salary.bonus ?? 0);
+  }
+
+  paymentStatusClass(salary: SalaryResponse): string {
+    return salary.paymentStatus === 'PAID' ? 'status-active' : 'status-on-leave';
+  }
+
+  markAsPaid(salary: SalaryResponse): void {
+    this.salaryService.markAsPaid(this.employeeId, salary.id).subscribe({
+      next: () => {
+        this.snackBar.open('Marked as paid — payslip emailed to the employee', 'Dismiss', { duration: 4000 });
+        this.loadSalaryData();
+      }
+    });
+  }
+
+  exportSalaryHistory(): void {
+    this.salaryService.exportHistory(this.employeeId).subscribe({
+      next: (blob) => downloadBlob(blob, `salary-history-${this.employee()?.employeeCode ?? this.employeeId}.xlsx`)
+    });
+  }
+
+  downloadPayslip(salary: SalaryResponse): void {
+    this.salaryService.downloadPayslip(this.employeeId, salary.id).subscribe({
+      next: (blob) => downloadBlob(blob, `payslip-${this.employee()?.employeeCode ?? this.employeeId}-${salary.effectiveFrom}.xlsx`)
+    });
   }
 
   private load(): void {

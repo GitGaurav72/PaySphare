@@ -12,6 +12,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatCardModule } from '@angular/material/card';
+import { MatDialog } from '@angular/material/dialog';
 import { debounceTime, distinctUntilChanged } from 'rxjs';
 import { EmployeeService } from '../../../core/services/employee.service';
 import { MasterDataService } from '../../../core/services/master-data.service';
@@ -19,6 +20,8 @@ import { AuthService } from '../../../core/services/auth.service';
 import { EmployeeSummaryResponse } from '../../../core/models/employee.model';
 import { EMPLOYEE_STATUSES, EmployeeStatus } from '../../../core/models/enums';
 import { CountryResponse, DepartmentResponse, DesignationResponse } from '../../../core/models/master-data.model';
+import { downloadBlob } from '../../../shared/utils/download.util';
+import { EmployeeBulkUploadDialogComponent } from './employee-bulk-upload-dialog.component';
 
 @Component({
   selector: 'app-employee-list',
@@ -66,7 +69,8 @@ export class EmployeeListComponent implements OnInit {
     private readonly employeeService: EmployeeService,
     private readonly masterDataService: MasterDataService,
     private readonly authService: AuthService,
-    private readonly router: Router
+    private readonly router: Router,
+    private readonly dialog: MatDialog
   ) {}
 
   get canEdit(): boolean {
@@ -103,6 +107,31 @@ export class EmployeeListComponent implements OnInit {
 
   createEmployee(): void {
     this.router.navigate(['/employees/new']);
+  }
+
+  openBulkUpload(): void {
+    const dialogRef = this.dialog.open(EmployeeBulkUploadDialogComponent, { width: '640px' });
+
+    dialogRef.afterClosed().subscribe((createdAny: boolean | undefined) => {
+      if (createdAny) {
+        this.pageIndex.set(0);
+        this.load();
+      }
+    });
+  }
+
+  exportReport(): void {
+    this.employeeService
+      .exportReport({
+        search: this.searchControl.value || undefined,
+        countryId: this.countryId ?? undefined,
+        departmentId: this.departmentId ?? undefined,
+        designationId: this.designationId ?? undefined,
+        status: this.status ?? undefined
+      })
+      .subscribe({
+        next: (blob) => downloadBlob(blob, 'employees-report.xlsx')
+      });
   }
 
   statusClass(status: EmployeeStatus): string {

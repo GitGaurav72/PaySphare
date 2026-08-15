@@ -18,7 +18,9 @@ public class SalaryMapper {
                 salaryHistory.getEffectiveTo(),
                 salaryHistory.getCreatedBy().getId(),
                 salaryHistory.getCreatedBy().getName(),
-                salaryHistory.getCreatedAt()
+                salaryHistory.getCreatedAt(),
+                salaryHistory.getPaymentStatus(),
+                salaryHistory.getPaidAt()
         );
     }
 }

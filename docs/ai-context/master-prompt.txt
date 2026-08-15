@@ -241,11 +241,11 @@ Constraints:
 
 Foreign keys:
 
-country_id → countries.id
+country_id -> countries.id
 
-department_id → departments.id
+department_id -> departments.id
 
-designation_id → designations.id
+designation_id -> designations.id
 
 Employee statuses:
 
@@ -273,9 +273,9 @@ salary_history:
 
 Foreign keys:
 
-employee_id → employees.id
+employee_id -> employees.id
 
-created_by → hr_users.id
+created_by -> hr_users.id
 
 Rules:
 
@@ -1130,23 +1130,23 @@ Do not return JPA entities directly.
 Use:
 
 Entity
-   ↓
+   ->
 Mapper
-   ↓
+   ->
 Response DTO
-   ↓
+   ->
 Controller
 
 
 For example:
 
 Employee
-    ↓
+    ->
 EmployeeResponse
 
 
 SalaryHistory
-    ↓
+    ->
 SalaryResponse
 
 
@@ -1501,13 +1501,13 @@ POST /api/employees/{id}/salary
 
 Security tests:
 
-Unauthenticated request → 401
+Unauthenticated request -> 401
 
-HR_VIEWER attempting salary modification → 403
+HR_VIEWER attempting salary modification -> 403
 
-HR_MANAGER modifying salary → allowed
+HR_MANAGER modifying salary -> allowed
 
-HR_ADMIN managing HR users → allowed
+HR_ADMIN managing HR users -> allowed
 
 
 ============================================================
@@ -1522,19 +1522,19 @@ Especially test salary history:
 
 Existing:
 
-2026-01-01 → NULL
+2026-01-01 -> NULL
 
 New:
 
-2026-08-01 → NULL
+2026-08-01 -> NULL
 
 After update:
 
 Old:
-2026-01-01 → 2026-07-31
+2026-01-01 -> 2026-07-31
 
 New:
-2026-08-01 → NULL
+2026-08-01 -> NULL
 
 
 Also test invalid overlapping salary periods.
@@ -1996,14 +1996,14 @@ Database:
 
                   PostgreSQL
                        |
-       ┌───────────────┼────────────────┐
+       -----------------+-----------------
        |               |                |
    employees      salary_history     hr_users
        |               |                |
        |               |                |
    countries      created_by            |
    departments        |                |
-   designations       ──────────────────┘
+   designations       -------------------
 
 
 ============================================================

@@ -26,4 +26,16 @@ export class SalaryService {
   create(employeeId: number, request: SalaryCreateRequest): Observable<SalaryResponse> {
     return this.http.post<SalaryResponse>(`${this.baseUrl}/${employeeId}/salary`, request);
   }
+
+  markAsPaid(employeeId: number, salaryId: number): Observable<SalaryResponse> {
+    return this.http.patch<SalaryResponse>(`${this.baseUrl}/${employeeId}/salary/${salaryId}/mark-paid`, {});
+  }
+
+  exportHistory(employeeId: number): Observable<Blob> {
+    return this.http.get(`${this.baseUrl}/${employeeId}/salary-history/export`, { responseType: 'blob' });
+  }
+
+  downloadPayslip(employeeId: number, salaryId: number): Observable<Blob> {
+    return this.http.get(`${this.baseUrl}/${employeeId}/salary/${salaryId}/payslip`, { responseType: 'blob' });
+  }
 }

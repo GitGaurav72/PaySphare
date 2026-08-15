@@ -20,6 +20,7 @@
 .header-actions {
   display: flex;
   gap: 10px;
+  flex-wrap: wrap;
 }
 
 .detail-grid {
@@ -37,10 +38,24 @@
   padding: 20px;
 }
 
+.history-card {
+  overflow-x: auto;
+}
+
 h2 {
   margin: 0 0 14px;
   font-size: 15px;
   font-weight: 500;
+}
+
+.history-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+
+  h2 { margin: 0; }
 }
 
 dl {
@@ -48,6 +63,11 @@ dl {
   grid-template-columns: 140px 1fr;
   row-gap: 10px;
   margin: 0;
+
+  @media (max-width: 420px) {
+    grid-template-columns: 1fr;
+    row-gap: 2px;
+  }
 }
 
 dt {
@@ -58,15 +78,31 @@ dt {
 dd {
   margin: 0;
   font-size: 14px;
+  word-break: break-word;
+
+  @media (max-width: 420px) {
+    margin-bottom: 8px;
+  }
 }
 
 .salary-summary {
   margin-bottom: 16px;
 }
 
+.salary-total-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
 .salary-total {
   font-size: 24px;
   font-weight: 600;
+}
+
+.mark-paid-btn {
+  width: 100%;
+  margin-top: 10px;
 }
 
 .salary-breakdown {

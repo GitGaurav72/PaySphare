@@ -2,9 +2,13 @@ package com.PaySphere.service;
 
 import com.PaySphere.dto.salary.SalaryCreateRequest;
 import com.PaySphere.dto.salary.SalaryResponse;
+import com.PaySphere.entity.Country;
+import com.PaySphere.entity.Department;
+import com.PaySphere.entity.Designation;
 import com.PaySphere.entity.Employee;
 import com.PaySphere.entity.HrRole;
 import com.PaySphere.entity.HrUser;
+import com.PaySphere.entity.PaymentStatus;
 import com.PaySphere.entity.SalaryHistory;
 import com.PaySphere.entity.UserStatus;
 import com.PaySphere.exception.BadRequestException;
@@ -42,6 +46,10 @@ class SalaryServiceImplTest {
     private EmployeeRepository employeeRepository;
     @Mock
     private HrUserRepository hrUserRepository;
+    @Mock
+    private ExcelReportService excelReportService;
+    @Mock
+    private EmailService emailService;
 
     private SalaryServiceImpl salaryService;
 
@@ -51,9 +59,20 @@ class SalaryServiceImplTest {
 
     @BeforeEach
     void setUp() {
-        salaryService = new SalaryServiceImpl(salaryHistoryRepository, employeeRepository, hrUserRepository, new SalaryMapper());
+        salaryService = new SalaryServiceImpl(
+                salaryHistoryRepository, employeeRepository, hrUserRepository, new SalaryMapper(),
+                excelReportService, emailService);
 
-        employee = Employee.builder().id(10L).build();
+        employee = Employee.builder()
+                .id(10L)
+                .employeeCode("EMP000010")
+                .firstName("Jane")
+                .lastName("Doe")
+                .email("jane.doe@example.com")
+                .country(Country.builder().id(1L).name("India").countryCode("IN").currencyCode("INR").build())
+                .department(Department.builder().id(1L).name("Engineering").build())
+                .designation(Designation.builder().id(1L).name("Software Engineer").build())
+                .build();
         hrUser = HrUser.builder().id(5L).name("HR Manager").role(HrRole.HR_MANAGER).status(UserStatus.ACTIVE)
                 .email("manager@paysphere.com").passwordHash("hash").build();
         actor = new AppUserPrincipal(hrUser);
@@ -147,6 +166,63 @@ class SalaryServiceImplTest {
         SalaryCreateRequest request = new SalaryCreateRequest("INR", new BigDecimal("1000000"), null, LocalDate.of(2026, 1, 1));
 
         assertThatThrownBy(() -> salaryService.createSalaryChange(404L, request, actor))
+                .isInstanceOf(ResourceNotFoundException.class);
+    }
+
+    @Test
+    void markAsPaid_withPendingSalary_marksPaidAndEmailsPayslip() {
+        SalaryHistory salary = SalaryHistory.builder()
+                .id(1L)
+                .employee(employee)
+                .currencyCode("INR")
+                .baseSalary(new BigDecimal("1000000"))
+                .bonus(new BigDecimal("50000"))
+                .effectiveFrom(LocalDate.of(2026, 1, 1))
+                .createdBy(hrUser)
+                .paymentStatus(PaymentStatus.PENDING)
+                .build();
+
+        when(salaryHistoryRepository.findById(1L)).thenReturn(Optional.of(salary));
+        when(excelReportService.generatePayslip(salary)).thenReturn(new byte[]{1, 2, 3});
+
+        SalaryResponse response = salaryService.markAsPaid(10L, 1L);
+
+        assertThat(response.paymentStatus()).isEqualTo(PaymentStatus.PAID);
+        assertThat(response.paidAt()).isNotNull();
+        verify(emailService).sendPayslip(
+                org.mockito.ArgumentMatchers.eq("jane.doe@example.com"),
+                org.mockito.ArgumentMatchers.eq("Jane Doe"),
+                org.mockito.ArgumentMatchers.any(),
+                org.mockito.ArgumentMatchers.anyString());
+    }
+
+    @Test
+    void markAsPaid_whenAlreadyPaid_throwsBadRequest() {
+        SalaryHistory salary = SalaryHistory.builder()
+                .id(1L)
+                .employee(employee)
+                .paymentStatus(PaymentStatus.PAID)
+                .build();
+
+        when(salaryHistoryRepository.findById(1L)).thenReturn(Optional.of(salary));
+
+        assertThatThrownBy(() -> salaryService.markAsPaid(10L, 1L))
+                .isInstanceOf(BadRequestException.class);
+
+        verify(emailService, never()).sendPayslip(any(), any(), any(), any());
+    }
+
+    @Test
+    void markAsPaid_withSalaryBelongingToDifferentEmployee_throwsResourceNotFoundException() {
+        SalaryHistory salary = SalaryHistory.builder()
+                .id(1L)
+                .employee(employee)
+                .paymentStatus(PaymentStatus.PENDING)
+                .build();
+
+        when(salaryHistoryRepository.findById(1L)).thenReturn(Optional.of(salary));
+
+        assertThatThrownBy(() -> salaryService.markAsPaid(999L, 1L))
                 .isInstanceOf(ResourceNotFoundException.class);
     }
 }

@@ -13,4 +13,6 @@ public interface SalaryService {
     List<SalaryResponse> getSalaryHistory(Long employeeId);
 
     SalaryResponse createSalaryChange(Long employeeId, SalaryCreateRequest request, AppUserPrincipal actor);
+
+    SalaryResponse markAsPaid(Long employeeId, Long salaryId);
 }

@@ -11,6 +11,18 @@ spring:
     show-sql: false
   flyway:
     enabled: false
+  mail:
+    host: localhost
+    port: 1025
+    properties:
+      mail:
+        smtp:
+          auth: false
+          starttls:
+            enable: false
+        connectiontimeout: 1000
+        timeout: 1000
+        writetimeout: 1000
 
 app:
   jwt:
@@ -20,6 +32,8 @@ app:
     allowed-origin: http://localhost:4200
   seed:
     enabled: false
+  mail:
+    from: noreply@paysphere.com
 
 logging:
   level:

@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { PageResponse } from '../models/common.model';
 import {
+  BulkUploadResponse,
   EmployeeCreateRequest,
   EmployeeResponse,
   EmployeeSearchParams,
@@ -46,5 +47,29 @@ export class EmployeeService {
 
   updateStatus(id: number, request: EmployeeStatusUpdateRequest): Observable<EmployeeResponse> {
     return this.http.patch<EmployeeResponse>(`${this.baseUrl}/${id}/status`, request);
+  }
+
+  exportReport(params: EmployeeSearchParams): Observable<Blob> {
+    let httpParams = new HttpParams();
+    if (params.search) httpParams = httpParams.set('search', params.search);
+    if (params.countryId != null) httpParams = httpParams.set('countryId', params.countryId);
+    if (params.departmentId != null) httpParams = httpParams.set('departmentId', params.departmentId);
+    if (params.designationId != null) httpParams = httpParams.set('designationId', params.designationId);
+    if (params.status) httpParams = httpParams.set('status', params.status);
+
+    return this.http.get(`${environment.apiUrl}/reports/employees/export`, {
+      params: httpParams,
+      responseType: 'blob'
+    });
+  }
+
+  downloadBulkTemplate(): Observable<Blob> {
+    return this.http.get(`${this.baseUrl}/bulk-template`, { responseType: 'blob' });
+  }
+
+  bulkUpload(file: File): Observable<BulkUploadResponse> {
+    const formData = new FormData();
+    formData.append('file', file);
+    return this.http.post<BulkUploadResponse>(`${this.baseUrl}/bulk-upload`, formData);
   }
 }

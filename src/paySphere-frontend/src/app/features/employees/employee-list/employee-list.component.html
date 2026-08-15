@@ -1,12 +1,22 @@
 <div class="page-container">
   <div class="page-header">
     <h1>Employees</h1>
-    @if (canEdit) {
-      <button mat-flat-button color="primary" (click)="createEmployee()">
-        <mat-icon>add</mat-icon>
-        Add employee
+    <div class="header-actions">
+      <button mat-stroked-button (click)="exportReport()">
+        <mat-icon>file_download</mat-icon>
+        Export Excel
       </button>
-    }
+      @if (canEdit) {
+        <button mat-stroked-button (click)="openBulkUpload()">
+          <mat-icon>upload_file</mat-icon>
+          Add bulk employees
+        </button>
+        <button mat-flat-button color="primary" (click)="createEmployee()">
+          <mat-icon>add</mat-icon>
+          Add employee
+        </button>
+      }
+    </div>
   </div>
 
   <mat-card class="filters-card">

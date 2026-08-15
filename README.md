@@ -6,20 +6,19 @@ employees across multiple countries and answer questions about how the org pays 
 See [`docs/REQUIREMENTS.md`](docs/REQUIREMENTS.md) for the one-page requirements document
 (goal, scope, and what was deliberately left out).
 
-The backend is complete and tested; the Angular frontend is the next phase (see
-[Status](#status) below).
+Both the backend and the Angular frontend are built (see [Status](#status) below).
 
 ## Tech Stack
 
 - **Backend:** Java 17, Spring Boot 3.2, Spring Data JPA, Spring Security, JWT (JJWT),
   PostgreSQL, Flyway, Maven
-- **Frontend:** Angular + Angular Material (planned, not yet built)
+- **Frontend:** Angular 19 (standalone components), Angular Material, Chart.js (ng2-charts)
 - **Testing:** JUnit 5, Mockito, MockMvc, H2 (in-memory, for fast deterministic tests)
 
 ## Architecture
 
 ```
-Angular (planned)
+Angular 19 SPA (src/paysphere-frontend)
     |
     | REST + JWT (Bearer token)
     v
@@ -61,8 +60,9 @@ CREATE DATABASE paysphere;
 | `SEED_EMPLOYEE_COUNT` | How many employees to seed | `10000` |
 | `SPRING_PROFILES_ACTIVE` | `dev` or `prod` | `dev` |
 
-In `prod`, `JWT_SECRET`, `DB_URL`, `DB_USERNAME`, `DB_PASSWORD` have **no defaults** and
-must be set explicitly — the app will refuse to start otherwise.
+`prod` falls back to the same `localhost` defaults as `dev` for local convenience, but a
+real deployment should always set `JWT_SECRET`, `DB_URL`, `DB_USERNAME`, and `DB_PASSWORD`
+explicitly via environment variables rather than relying on those fallbacks.
 
 ### 3. Run it
 
@@ -100,6 +100,18 @@ curl -X POST http://localhost:8080/api/auth/login \
 ```
 
 Use the returned `accessToken` as `Authorization: Bearer <token>` on subsequent requests.
+
+### 6. Run the frontend
+
+```bash
+cd src/paysphere-frontend
+npm install
+npm start   # ng serve, http://localhost:4200
+```
+
+The dev server proxies nothing special — `environment.development.ts` points straight at
+`http://localhost:8082/api`, matching the backend's CORS allowance for `FRONTEND_URL`
+(default `http://localhost:4200`). Sign in with any of the seeded demo accounts above.
 
 ## API Overview
 
@@ -169,5 +181,7 @@ correct role).
 
 - [x] Backend: auth, RBAC, employee APIs, salary APIs (transactional, concurrency-safe),
       dashboard analytics, validation, global exception handling, seed data, tests
-- [ ] Frontend: Angular + Angular Material (not yet started)
+- [x] Frontend: Angular 19 + Angular Material — login, RBAC-aware dashboard (charts +
+      stat cards), employee search/list/detail/create/edit, salary history + salary
+      change form, HR user admin screen
 - [ ] Deployment

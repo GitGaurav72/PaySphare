@@ -45,12 +45,21 @@
         <h2>Current salary</h2>
         @if (currentSalary(); as salary) {
           <div class="salary-summary">
-            <div class="salary-total">{{ total(salary) | money: salary.currencyCode }}</div>
+            <div class="salary-total-row">
+              <div class="salary-total">{{ total(salary) | money: salary.currencyCode }}</div>
+              <mat-chip class="status-chip" [ngClass]="paymentStatusClass(salary)" disableRipple>{{ salary.paymentStatus | titlecase }}</mat-chip>
+            </div>
             <div class="salary-breakdown">
               Base {{ salary.baseSalary | money: salary.currencyCode }} + Bonus {{ salary.bonus | money: salary.currencyCode }}
             </div>
             <div class="salary-meta">Effective from {{ salary.effectiveFrom | date: 'mediumDate' }}</div>
           </div>
+          @if (canEdit && salary.paymentStatus === 'PENDING') {
+            <button mat-stroked-button class="mark-paid-btn" (click)="markAsPaid(salary)">
+              <mat-icon>paid</mat-icon>
+              Mark as paid
+            </button>
+          }
         } @else {
           <p class="no-salary">No salary record yet.</p>
         }
@@ -64,7 +73,15 @@
     </div>
 
     <mat-card class="history-card">
-      <h2>Salary history</h2>
+      <div class="history-header">
+        <h2>Salary history</h2>
+        @if (salaryHistory().length > 0) {
+          <button mat-stroked-button (click)="exportSalaryHistory()">
+            <mat-icon>file_download</mat-icon>
+            Export Excel
+          </button>
+        }
+      </div>
       @if (salaryHistory().length === 0) {
         <div class="empty-state">
           <mat-icon>history</mat-icon>
@@ -97,9 +114,30 @@
             <td mat-cell *matCellDef="let row">{{ total(row) | money: row.currencyCode }}</td>
           </ng-container>
 
+          <ng-container matColumnDef="paymentStatus">
+            <th mat-header-cell *matHeaderCellDef>Payment</th>
+            <td mat-cell *matCellDef="let row">
+              <mat-chip class="status-chip" [ngClass]="paymentStatusClass(row)" disableRipple>{{ row.paymentStatus | titlecase }}</mat-chip>
+            </td>
+          </ng-container>
+
           <ng-container matColumnDef="createdByName">
             <th mat-header-cell *matHeaderCellDef>Recorded by</th>
             <td mat-cell *matCellDef="let row">{{ row.createdByName }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef></th>
+            <td mat-cell *matCellDef="let row">
+              <button mat-icon-button matTooltip="Download payslip" (click)="downloadPayslip(row)">
+                <mat-icon>receipt_long</mat-icon>
+              </button>
+              @if (canEdit && row.paymentStatus === 'PENDING') {
+                <button mat-icon-button matTooltip="Mark as paid" (click)="markAsPaid(row)">
+                  <mat-icon>paid</mat-icon>
+                </button>
+              }
+            </td>
           </ng-container>
 
           <tr mat-header-row *matHeaderRowDef="historyColumns"></tr>

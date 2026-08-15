@@ -1,5 +1,7 @@
 package com.PaySphere.dto.salary;
 
+import com.PaySphere.entity.PaymentStatus;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -14,6 +16,8 @@ public record SalaryResponse(
         LocalDate effectiveTo,
         Long createdById,
         String createdByName,
-        LocalDateTime createdAt
+        LocalDateTime createdAt,
+        PaymentStatus paymentStatus,
+        LocalDateTime paidAt
 ) {
 }
