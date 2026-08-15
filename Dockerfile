@@ -23,4 +23,5 @@ WORKDIR /app
 COPY --from=backend-build /workspace/backend/target/PaySphere-0.0.1-SNAPSHOT.war app.war
 
 EXPOSE 8082
-ENTRYPOINT ["java", "-jar", "/app/app.war"]
+# Keep the JVM within Render's 512 MiB starter-instance memory limit.
+ENTRYPOINT ["java", "-XX:MaxRAMPercentage=40.0", "-XX:MaxMetaspaceSize=160m", "-XX:ReservedCodeCacheSize=32m", "-Xss512k", "-jar", "/app/app.war"]
