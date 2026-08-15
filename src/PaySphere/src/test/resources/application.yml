@@ -1,0 +1,26 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:paysphere-test;MODE=PostgreSQL;DB_CLOSE_DELAY=-1
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    open-in-view: false
+    show-sql: false
+  flyway:
+    enabled: false
+
+app:
+  jwt:
+    secret: test-only-secret-key-for-jwt-signing-not-for-production-use-0123456789
+    expiration-ms: 3600000
+  cors:
+    allowed-origin: http://localhost:4200
+  seed:
+    enabled: false
+
+logging:
+  level:
+    com.PaySphere: INFO
