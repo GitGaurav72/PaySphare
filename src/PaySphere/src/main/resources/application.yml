@@ -1,0 +1,30 @@
+spring:
+  application:
+    name: PaySphere
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:dev}
+  jackson:
+    default-property-inclusion: non_null
+server:
+  port: 8082
+app:
+  jwt:
+    secret: ${JWT_SECRET:}
+    expiration-ms: ${JWT_EXPIRATION:3600000}
+  cors:
+    allowed-origin: ${FRONTEND_URL:http://localhost:4200}
+  seed:
+    enabled: ${SEED_ENABLED:false}
+    employee-count: ${SEED_EMPLOYEE_COUNT:10000}
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+  api-docs:
+    path: /v3/api-docs
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
