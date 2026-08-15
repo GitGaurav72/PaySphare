@@ -1,0 +1,53 @@
+<mat-sidenav-container class="shell-container">
+  <mat-sidenav mode="side" opened class="shell-sidenav">
+    <div class="brand">
+      <mat-icon>payments</mat-icon>
+      <span>PaySphere</span>
+    </div>
+
+    <mat-nav-list>
+      <a mat-list-item routerLink="/dashboard" routerLinkActive="active-link">
+        <mat-icon matListItemIcon>space_dashboard</mat-icon>
+        <span matListItemTitle>Dashboard</span>
+      </a>
+      <a mat-list-item routerLink="/employees" routerLinkActive="active-link">
+        <mat-icon matListItemIcon>groups</mat-icon>
+        <span matListItemTitle>Employees</span>
+      </a>
+      @if (isAdmin) {
+        <a mat-list-item routerLink="/hr-users" routerLinkActive="active-link">
+          <mat-icon matListItemIcon>admin_panel_settings</mat-icon>
+          <span matListItemTitle>HR Users</span>
+        </a>
+      }
+    </mat-nav-list>
+  </mat-sidenav>
+
+  <mat-sidenav-content>
+    <mat-toolbar color="primary" class="shell-toolbar">
+      <span class="spacer"></span>
+
+      <button mat-button [matMenuTriggerFor]="userMenu" class="user-menu-trigger">
+        <div class="avatar">{{ initials(currentUser()?.name) }}</div>
+        <span class="user-name">{{ currentUser()?.name }}</span>
+        <mat-icon>expand_more</mat-icon>
+      </button>
+      <mat-menu #userMenu="matMenu">
+        <div class="menu-user-info">
+          <div class="menu-user-name">{{ currentUser()?.name }}</div>
+          <div class="menu-user-email">{{ currentUser()?.email }}</div>
+          <div class="menu-user-role">{{ currentUser()?.role }}</div>
+        </div>
+        <mat-divider></mat-divider>
+        <button mat-menu-item (click)="logout()">
+          <mat-icon>logout</mat-icon>
+          <span>Sign out</span>
+        </button>
+      </mat-menu>
+    </mat-toolbar>
+
+    <main class="shell-main">
+      <router-outlet></router-outlet>
+    </main>
+  </mat-sidenav-content>
+</mat-sidenav-container>

@@ -1,0 +1,43 @@
+.filters-card {
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+.filters-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.search-field {
+  flex: 1 1 240px;
+  min-width: 220px;
+}
+
+.filters-row mat-form-field:not(.search-field) {
+  width: 170px;
+}
+
+.table-card {
+  padding: 0;
+  overflow-x: auto;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.loading-state {
+  display: flex;
+  justify-content: center;
+  padding: 64px 0;
+}
+
+.clickable-row {
+  cursor: pointer;
+}
+
+.clickable-row:hover {
+  background: rgba(0, 0, 0, 0.03);
+}

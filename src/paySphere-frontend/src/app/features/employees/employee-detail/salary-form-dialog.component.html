@@ -1,0 +1,60 @@
+<h2 mat-dialog-title>Add salary change</h2>
+<form [formGroup]="form" (ngSubmit)="submit()">
+  <mat-dialog-content>
+    <p class="hint">This creates a new current salary record; the existing record will be closed automatically.</p>
+
+    <mat-form-field class="full-width">
+      <mat-label>Currency code</mat-label>
+      <input matInput formControlName="currencyCode" placeholder="e.g. USD" maxlength="10" />
+      @if (form.controls.currencyCode.hasError('required') && form.controls.currencyCode.touched) {
+        <mat-error>Currency code is required</mat-error>
+      }
+      @if (form.controls.currencyCode.hasError('minlength') && form.controls.currencyCode.touched) {
+        <mat-error>Currency code must be at least 3 characters</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field class="full-width">
+      <mat-label>Base salary</mat-label>
+      <input matInput type="number" min="0" formControlName="baseSalary" />
+      @if (form.controls.baseSalary.hasError('required') && form.controls.baseSalary.touched) {
+        <mat-error>Base salary is required</mat-error>
+      }
+      @if (form.controls.baseSalary.hasError('min') && form.controls.baseSalary.touched) {
+        <mat-error>Base salary cannot be negative</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field class="full-width">
+      <mat-label>Bonus</mat-label>
+      <input matInput type="number" min="0" formControlName="bonus" />
+      @if (form.controls.bonus.hasError('min') && form.controls.bonus.touched) {
+        <mat-error>Bonus cannot be negative</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field class="full-width">
+      <mat-label>Effective from</mat-label>
+      <input matInput [matDatepicker]="picker" formControlName="effectiveFrom" />
+      <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+      <mat-datepicker #picker></mat-datepicker>
+      @if (form.controls.effectiveFrom.hasError('required') && form.controls.effectiveFrom.touched) {
+        <mat-error>Effective date is required</mat-error>
+      }
+    </mat-form-field>
+
+    @if (errorMessage()) {
+      <div class="error-banner">{{ errorMessage() }}</div>
+    }
+  </mat-dialog-content>
+  <mat-dialog-actions align="end">
+    <button mat-button type="button" (click)="cancel()">Cancel</button>
+    <button mat-flat-button color="primary" type="submit" [disabled]="saving()">
+      @if (saving()) {
+        <mat-spinner diameter="20"></mat-spinner>
+      } @else {
+        <span>Save</span>
+      }
+    </button>
+  </mat-dialog-actions>
+</form>

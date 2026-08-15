@@ -1,0 +1,24 @@
+.table-card {
+  padding: 0;
+  overflow-x: auto;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.loading-state {
+  display: flex;
+  justify-content: center;
+  padding: 64px 0;
+}
+
+.you-badge {
+  margin-left: 8px;
+  font-size: 11px;
+  background: #eef1fb;
+  color: #3f51b5;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-weight: 600;
+}

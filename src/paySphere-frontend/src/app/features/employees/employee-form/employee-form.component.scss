@@ -1,0 +1,46 @@
+.narrow {
+  max-width: 760px;
+}
+
+.form-card {
+  padding: 24px;
+}
+
+.loading-state {
+  display: flex;
+  justify-content: center;
+  padding: 48px 0;
+}
+
+.employee-code-badge {
+  display: inline-block;
+  background: #eef1fb;
+  color: #3f51b5;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 20px;
+  margin-bottom: 16px;
+}
+
+.span-2 {
+  grid-column: span 2;
+
+  @media (max-width: 640px) {
+    grid-column: span 1;
+  }
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 16px;
+
+  button[type='submit'] {
+    min-width: 140px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}

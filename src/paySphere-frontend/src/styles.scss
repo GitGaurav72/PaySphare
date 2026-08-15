@@ -1,0 +1,80 @@
+/* You can add global styles to this file, and also import other style files */
+
+html, body { height: 100%; }
+body {
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+  background: #f4f6f8;
+}
+
+* { box-sizing: border-box; }
+
+.page-container {
+  padding: 24px;
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 20px;
+
+  h1 {
+    margin: 0;
+    font-size: 22px;
+    font-weight: 500;
+  }
+}
+
+.full-width { width: 100%; }
+
+.spacer { flex: 1 1 auto; }
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0 16px;
+
+  @media (max-width: 640px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.chart-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.mat-mdc-card { border-radius: 12px !important; }
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 16px;
+  color: rgba(0, 0, 0, 0.5);
+  text-align: center;
+
+  mat-icon { font-size: 40px; width: 40px; height: 40px; margin-bottom: 8px; }
+}
+
+.status-chip {
+  &.status-active { background: #e3f5e6 !important; color: #1e7e34 !important; }
+  &.status-inactive { background: #f1f1f1 !important; color: #616161 !important; }
+  &.status-on-leave { background: #fff4e0 !important; color: #b06d00 !important; }
+  &.status-terminated { background: #fdecea !important; color: #c62828 !important; }
+}

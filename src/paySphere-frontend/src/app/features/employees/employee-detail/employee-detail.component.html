@@ -1,0 +1,115 @@
+<div class="page-container">
+  @if (employee(); as emp) {
+    <div class="page-header">
+      <div class="header-title">
+        <a routerLink="/employees" class="back-link">
+          <mat-icon>arrow_back</mat-icon>
+        </a>
+        <h1>{{ emp.firstName }} {{ emp.lastName }}</h1>
+        <mat-chip class="status-chip" [ngClass]="statusClass(emp.status)" disableRipple>{{ emp.status }}</mat-chip>
+      </div>
+      @if (canEdit) {
+        <div class="header-actions">
+          <button mat-stroked-button (click)="changeStatus()">
+            <mat-icon>sync_alt</mat-icon>
+            Change status
+          </button>
+          <button mat-flat-button color="primary" (click)="editEmployee()">
+            <mat-icon>edit</mat-icon>
+            Edit
+          </button>
+        </div>
+      }
+    </div>
+
+    <div class="detail-grid">
+      <mat-card class="info-card">
+        <h2>Employee details</h2>
+        <dl>
+          <dt>Employee code</dt>
+          <dd>{{ emp.employeeCode }}</dd>
+          <dt>Email</dt>
+          <dd>{{ emp.email }}</dd>
+          <dt>Department</dt>
+          <dd>{{ emp.departmentName }}</dd>
+          <dt>Designation</dt>
+          <dd>{{ emp.designationName }}</dd>
+          <dt>Country</dt>
+          <dd>{{ emp.countryName }}</dd>
+          <dt>Joining date</dt>
+          <dd>{{ emp.joiningDate | date: 'mediumDate' }}</dd>
+        </dl>
+      </mat-card>
+
+      <mat-card class="salary-card">
+        <h2>Current salary</h2>
+        @if (currentSalary(); as salary) {
+          <div class="salary-summary">
+            <div class="salary-total">{{ total(salary) | money: salary.currencyCode }}</div>
+            <div class="salary-breakdown">
+              Base {{ salary.baseSalary | money: salary.currencyCode }} + Bonus {{ salary.bonus | money: salary.currencyCode }}
+            </div>
+            <div class="salary-meta">Effective from {{ salary.effectiveFrom | date: 'mediumDate' }}</div>
+          </div>
+        } @else {
+          <p class="no-salary">No salary record yet.</p>
+        }
+        @if (canEdit) {
+          <button mat-stroked-button color="primary" class="add-salary-btn" (click)="addSalaryChange()">
+            <mat-icon>add</mat-icon>
+            Add salary change
+          </button>
+        }
+      </mat-card>
+    </div>
+
+    <mat-card class="history-card">
+      <h2>Salary history</h2>
+      @if (salaryHistory().length === 0) {
+        <div class="empty-state">
+          <mat-icon>history</mat-icon>
+          <p>No salary history yet.</p>
+        </div>
+      } @else {
+        <table mat-table [dataSource]="salaryHistory()" class="full-width">
+          <ng-container matColumnDef="effectiveFrom">
+            <th mat-header-cell *matHeaderCellDef>Effective from</th>
+            <td mat-cell *matCellDef="let row">{{ row.effectiveFrom | date: 'mediumDate' }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="effectiveTo">
+            <th mat-header-cell *matHeaderCellDef>Effective to</th>
+            <td mat-cell *matCellDef="let row">{{ row.effectiveTo ? (row.effectiveTo | date: 'mediumDate') : 'Current' }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="baseSalary">
+            <th mat-header-cell *matHeaderCellDef>Base</th>
+            <td mat-cell *matCellDef="let row">{{ row.baseSalary | money: row.currencyCode }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="bonus">
+            <th mat-header-cell *matHeaderCellDef>Bonus</th>
+            <td mat-cell *matCellDef="let row">{{ row.bonus | money: row.currencyCode }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="total">
+            <th mat-header-cell *matHeaderCellDef>Total</th>
+            <td mat-cell *matCellDef="let row">{{ total(row) | money: row.currencyCode }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="createdByName">
+            <th mat-header-cell *matHeaderCellDef>Recorded by</th>
+            <td mat-cell *matCellDef="let row">{{ row.createdByName }}</td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="historyColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: historyColumns"></tr>
+        </table>
+      }
+    </mat-card>
+  } @else if (loading()) {
+    <div class="loading-state">
+      <mat-spinner diameter="36"></mat-spinner>
+    </div>
+  }
+</div>
