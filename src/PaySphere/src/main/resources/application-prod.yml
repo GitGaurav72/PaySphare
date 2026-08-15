@@ -1,8 +1,8 @@
 spring:
   datasource:
-    url: ${DB_URL:jdbc:postgresql://localhost:5432/kyvos}
-    username: ${DB_USERNAME:kyvos}
-    password: ${DB_PASSWORD:password}
+    url: ${DB_URL:jdbc:postgresql://dpg-da0as08u01pc738omb30-a.virginia-postgres.render.com/paysphere}
+    username: ${DB_USERNAME:paysphere}
+    password: ${DB_PASSWORD:tcgmBqHJUHNOFUE6Fu9qhB4xyh4jVKju}
   jpa:
     hibernate:
       ddl-auto: validate
