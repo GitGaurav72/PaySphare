@@ -46,6 +46,11 @@ springdoc:
     path: /v3/api-docs
 
 management:
+  health:
+    # Render has no SMTP server at localhost:1025. Keep service health focused
+    # on dependencies needed to serve requests (such as the database).
+    mail:
+      enabled: false
   endpoints:
     web:
       exposure:
